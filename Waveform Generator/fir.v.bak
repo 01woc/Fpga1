@@ -1,0 +1,62 @@
+module fir (
+    input clk,                      // 50 MHz Clock
+    input reset,                    // Active-low Reset
+    input signed [23:0] data_in,
+    output wire signed [23:0] data_out  // 24-bit Output Signal
+);
+
+// FIR Coefficients (Fixed-Point Q23 Format)
+reg signed [23:0] COEFFS[0:20];
+
+initial begin
+COEFFS[0] = 61681;
+COEFFS[1] = 79040;
+COEFFS[2] = 129416;
+COEFFS[3] = 207879;
+COEFFS[4] = 306749;
+COEFFS[5] = 416346;
+COEFFS[6] = 525944;
+COEFFS[7] = 624813;
+COEFFS[8] = 703277;
+COEFFS[9] = 753653;
+COEFFS[10] = 771012;
+COEFFS[11] = 753653;
+COEFFS[12] = 703277;
+COEFFS[13] = 624813;
+COEFFS[14] = 525944;
+COEFFS[15] = 416346;
+COEFFS[16] = 306749;
+COEFFS[17] = 207879;
+COEFFS[18] = 129416;
+COEFFS[19] = 79040;
+COEFFS[20] = 61681;
+end
+
+reg signed [23:0] shift_reg [0:20]; // 21-tap shift register
+reg signed [47:0] acc;              // Accumulator (output of MAC)
+integer i,j;
+reg signed [47:0] acc_temp;
+
+always @(posedge clk or posedge reset) begin
+    if (reset) begin
+        // Reset logic
+        for (i = 0; i < 21; i = i + 1)
+            shift_reg[i] <= 0;
+        acc <= 0;
+    end else begin
+        // Shift register logic
+        for (i = 20; i > 0; i = i - 1)
+            shift_reg[i] <= shift_reg[i-1];
+        shift_reg[0] <= data_in;
+        // MAC operation using a temporary variable
+        acc_temp = 0;
+        for (j = 0; j < 21; j = j + 1) begin
+            acc_temp = acc_temp + shift_reg[j] * COEFFS[j];
+        end
+        acc <= acc_temp;
+    end
+end
+
+assign data_out = acc[47:24]; // Truncate MSBs to fit 24-bit output
+
+endmodule

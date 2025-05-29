@@ -1,0 +1,21 @@
+module press_duty_cycle (
+  input wire i_clk,
+  input wire i_rst_n,
+  input wire i_KEY,
+  output reg [3:0] wave_sel
+);
+
+  reg [3:0] count;
+
+  always @(posedge i_clk) begin
+    if (~i_rst_n)
+      count <= 4'b0000;
+    else if (~i_KEY)
+      count <= count + 4'b0001;
+  end
+
+  always @(*) begin
+    wave_sel = count;
+  end
+
+endmodule

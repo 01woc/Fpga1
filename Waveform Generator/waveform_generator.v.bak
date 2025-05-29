@@ -1,0 +1,133 @@
+module waveform_generator(
+    input wire clk_50m, clk_48k, clk_12m,    // Xung clock hệ thống  	                               // Đặt lại hệ thống//  !i_KEY[0]
+    input wire [9:0] i_SW,                           // Công tắc điều khiển
+    input wire [3:0] i_KEY,                          // Các phím bấm
+    output  [15:0] waveform_out,                   // Tín hiệu sóng ra
+	  output [2:0] waveform_select
+);
+
+	 wire [15:0] sine_wave, square_wave, triangle_wave, ecg_wave, sawtooth_wave;
+    wire [9:0] phase_step_noise, phase_step_phase;
+    wire [9:0] phase_acc, phase_noise;
+    wire [15:0] noise_wave;
+    wire [15:0] final_wave;
+    wire [15:0] filtered_wave;
+	 wire [3:0] duty_cycle_sel;
+   wire reset = !i_KEY[0];
+    wire noise_enable;
+    wire [1:0] freq_wave_sel, freq_noise_sel;
+    wire firiir;
+	 
+	 
+    assign noise_enable   = i_SW[3];
+    assign freq_wave_sel  = i_SW[5:4];
+    assign freq_noise_sel = i_SW[7:6];
+    assign firiir         = i_SW[8];
+   //tang duty_cycle
+
+press_duty_cycle 	press_duty(
+		.clk(clk_48k),
+      .reset(reset),
+      .i_KEY(i_KEY[1]),
+		.wave_sel(duty_cycle_sel)
+
+);
+  //chon song
+  choose_wave_sel choose_wave_sel(
+		.clk(clk_48k),
+      .reset(reset),
+		.key(i_KEY[2]),
+		.waveform_select(waveform_select)
+  );
+  
+//song
+    sine_wave_gen sine_gen (
+        .clk(clk_48k),
+        .reset(reset),
+        .phase_acc(phase_acc),
+        .sine_wave(sine_wave)
+    );
+       square_wave_gen square_gen (
+        .phase_acc(phase_acc),
+        .duty_cycle(duty_cycle_sel),
+        .square_wave(square_wave)
+    );
+	    triangle_wave_gen triangle_gen (
+        .clk(clk_48k),
+        .reset(reset),
+        .phase_acc(phase_acc),
+        .triangle_wave(triangle_wave)
+    );
+	   ecg_wave_gen ecg_gen (
+        .clk(clk_48k),
+        .reset(reset),
+        .phase_acc(phase_acc),
+        .ecg_wave(ecg_wave)
+    );
+	   sawtooth_wave_gen sawtooth_gen (
+        .clk(clk_48k),
+        .reset(reset),
+        .phase_acc(phase_acc),
+        .sawtooth_wave(sawtooth_wave)
+    );
+    phase_accumulator phase_gen (
+        .clk(clk_48k),
+        .reset(reset),
+        .phase_step(phase_step_phase),
+        .phase_acc(phase_acc)
+    );
+    
+    phase_accumulator phase_noise1 (
+        .clk(clk_48k),
+        .reset(reset),
+        .phase_step(phase_step_noise),
+        .phase_acc(phase_noise)
+    );
+    
+    frequency_wave_sel wave_sel_freq(
+        .freq_wave_sel(freq_wave_sel),
+        .o_phase_step(phase_step_phase)
+    );
+    
+    frequency_noise_sel noise_sel_freq(
+        .freq_noise_sel(freq_noise_sel),
+        .o_phase_step(phase_step_noise)
+    );
+    
+    fir fir_filter (
+        .clk(clk_48k),
+        .reset(reset),
+        .data_in(final_wave),
+        .data_out(filtered_wave)
+    );
+    
+ 
+    // Lựa chọn sóng cuối cùng (sóng đã chọn + nhiễu nếu có)
+	 
+	  reg [15:0] selected_wave;
+    always @(*) begin
+        case (waveform_select)
+            3'b000: selected_wave = sine_wave;               // Chọn sóng sin
+            3'b001: selected_wave = square_wave;             // Chọn sóng vuông
+            3'b010: selected_wave = triangle_wave;           // Chọn sóng tam giác
+            3'b011: selected_wave = ecg_wave;                // Chọn sóng ECG
+            3'b100: selected_wave = sawtooth_wave;           // Chọn sóng răng cưa
+            default: selected_wave = 16'b0;                  // Giá trị mặc định là 0
+        endcase
+    end   
+	 
+	 noise_injection noise_gen (
+        .clk(clk_48k),
+        .reset(reset),
+        .input_wave(selected_wave),
+        .output_wave(noise_wave)
+    );
+
+    assign final_wave = noise_enable ? noise_wave : selected_wave;
+
+  
+      assign  waveform_out = firiir ?  filtered_wave : final_wave ;
+       
+    
+
+endmodule

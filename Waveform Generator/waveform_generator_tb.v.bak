@@ -1,0 +1,72 @@
+`timescale 1ns / 1ps
+
+module waveform_generator_tb;
+
+    // Tín hiệu đầu vào
+    reg clk;
+    reg reset;
+    reg noise_enable;
+    reg firiir;
+
+    // Tín hiệu đầu ra
+    wire [23:0] waveform_out;
+
+    // Khởi tạo module DUT (Device Under Test)
+    waveform_generator uut (
+        .clk(clk),
+        .reset(reset),
+        .noise_enable(noise_enable),
+        .firiir(firiir),
+        .waveform_out(waveform_out)
+    );
+
+    // Tạo xung clock 50MHz
+    initial begin
+        clk = 0;
+        forever #10 clk = ~clk; // 20ns period -> 50MHz
+    end
+
+    // Kịch bản kiểm tra
+    initial begin
+        // Khởi tạo
+        reset = 1;
+        noise_enable = 0;
+        firiir = 0;
+
+        // Reset kéo dài 100ns
+        #100;
+        reset = 0;
+
+        // Không nhiễu, không lọc
+        #200;
+        noise_enable = 0;
+        firiir = 0;
+
+        // Bật nhiễu
+        #200;
+        noise_enable = 1;
+
+        // Bật lọc
+        #200;
+        firiir = 1;
+
+        // Tắt nhiễu
+        #200;
+        noise_enable = 0;
+
+        // Tắt lọc
+        #200;
+        firiir = 0;
+
+        // Kết thúc mô phỏng
+        #500;
+        $finish;
+    end
+
+    // Giám sát sóng ra
+    initial begin
+        $dumpfile("waveform_generator_tb.vcd"); // Cho GTKWave
+        $dumpvars(0, waveform_generator_tb);
+    end
+
+endmodule

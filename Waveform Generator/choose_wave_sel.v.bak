@@ -1,0 +1,21 @@
+module choose_wave_selchoose_wave_sel (
+    input wire clk,
+    input wire reset,
+    input wire i_KEY,
+    output reg [2:0] wave_sel
+);
+
+    reg [2:0] count;
+
+    always @(posedge clk) begin
+        if (!reset)
+            count <= 3'b000;
+        else if (!i_KEY)
+            count <= count + 3'b001;
+    end
+
+    always @(*) begin
+        wave_sel = count;
+    end
+
+endmodule

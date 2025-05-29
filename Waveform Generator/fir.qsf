@@ -1,0 +1,119 @@
+# -------------------------------------------------------------------------- #
+#
+# Copyright (C) 2021  Intel Corporation. All rights reserved.
+# Your use of Intel Corporation's design tools, logic functions 
+# and other software and tools, and any partner logic 
+# functions, and any output files from any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Intel Program License 
+# Subscription Agreement, the Intel Quartus Prime License Agreement,
+# the Intel FPGA IP License Agreement, or other applicable license
+# agreement, including, without limitation, that your use is for
+# the sole purpose of programming logic devices manufactured by
+# Intel and sold by Intel or its authorized distributors.  Please
+# refer to the applicable agreement for further details, at
+# https://fpgasoftware.intel.com/eula.
+#
+# -------------------------------------------------------------------------- #
+#
+# Quartus Prime
+# Version 21.1.0 Build 842 10/21/2021 SJ Lite Edition
+# Date created = 16:12:14  May 05, 2025
+#
+# -------------------------------------------------------------------------- #
+#
+# Notes:
+#
+# 1) The default values for assignments are stored in the file:
+#		fir_assignment_defaults.qdf
+#    If this file doesn't exist, see file:
+#		assignment_defaults.qdf
+#
+# 2) Intel recommends that you do not modify this file. This
+#    file is updated automatically by the Quartus Prime software
+#    and any changes you make may be lost or overwritten.
+#
+# -------------------------------------------------------------------------- #
+
+
+set_global_assignment -name FAMILY "Cyclone V"
+set_global_assignment -name DEVICE 5CSXFC6D6F31C6
+set_global_assignment -name TOP_LEVEL_ENTITY top
+set_global_assignment -name ORIGINAL_QUARTUS_VERSION 21.1.0
+set_global_assignment -name PROJECT_CREATION_TIME_DATE "16:12:14  MAY 05, 2025"
+set_global_assignment -name LAST_QUARTUS_VERSION "21.1.0 Lite Edition"
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
+set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
+set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 256
+set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
+set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+set_global_assignment -name EDA_SIMULATION_TOOL "Questa Intel FPGA (Verilog)"
+set_global_assignment -name EDA_TIME_SCALE "1 ps" -section_id eda_simulation
+set_global_assignment -name EDA_OUTPUT_DATA_FORMAT "VERILOG HDL" -section_id eda_simulation
+set_global_assignment -name VERILOG_FILE fir.v
+set_global_assignment -name VERILOG_FILE waveform_generator.v
+set_global_assignment -name VERILOG_FILE phase_accumulator.v
+set_global_assignment -name SOURCE_FILE sine_lut.dump
+set_global_assignment -name VERILOG_FILE sine_wave_gen.v
+set_global_assignment -name VERILOG_FILE noise_injection.v
+set_global_assignment -name VERILOG_FILE waveform_generator_tb.v
+set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS TEST_BENCH_MODE -section_id eda_simulation
+set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH waveform_generator_tb -section_id eda_simulation
+set_global_assignment -name EDA_TEST_BENCH_NAME waveform_generator_tb -section_id eda_simulation
+set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id waveform_generator_tb
+set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME waveform_generator_tb -section_id waveform_generator_tb
+set_global_assignment -name VERILOG_FILE frequency_wave_sel.v
+set_global_assignment -name VERILOG_FILE clk_12M.v
+set_global_assignment -name VERILOG_FILE clock_48K.v
+set_global_assignment -name VERILOG_FILE audio_codec.v
+set_global_assignment -name VERILOG_FILE i2c_av_config.v
+set_global_assignment -name VERILOG_FILE i2c_controller.v
+set_global_assignment -name VERILOG_FILE top.v
+set_location_assignment PIN_AF14 -to clk_50m
+set_location_assignment PIN_AJ29 -to AUD_ADCDAT
+set_location_assignment PIN_AH29 -to AUD_ADCLRCK
+set_location_assignment PIN_AF30 -to AUD_BCLK
+set_location_assignment PIN_AF29 -to AUD_DACDAT
+set_location_assignment PIN_AG30 -to AUD_DACLRCK
+set_location_assignment PIN_Y24 -to I2C_SCLK
+set_location_assignment PIN_Y23 -to I2C_SDAT
+set_location_assignment PIN_AA30 -to reset
+set_location_assignment PIN_AK4 -to i_KEY[1]
+set_location_assignment PIN_AA14 -to i_KEY[2]
+set_location_assignment PIN_AA15 -to i_KEY[3]
+set_location_assignment PIN_AB30 -to i_SW[0]
+set_location_assignment PIN_Y27 -to i_SW[1]
+set_location_assignment PIN_AB28 -to i_SW[2]
+set_location_assignment PIN_AC30 -to i_SW[3]
+set_location_assignment PIN_W25 -to i_SW[4]
+set_location_assignment PIN_V25 -to i_SW[5]
+set_location_assignment PIN_AC28 -to i_SW[6]
+set_location_assignment PIN_AD30 -to i_SW[7]
+set_location_assignment PIN_AC29 -to i_SW[8]
+set_location_assignment PIN_AJ4 -to i_KEY[0]
+set_global_assignment -name VERILOG_FILE square_wave_gen.v
+set_global_assignment -name VERILOG_FILE triangle_wave_gen.v
+set_global_assignment -name VERILOG_FILE ecg_wave_gen.v
+set_global_assignment -name VERILOG_FILE sawtooth_wave_gen.v
+set_global_assignment -name SOURCE_FILE ecg_lut.dump
+set_global_assignment -name SOURCE_FILE square_lut50.dump
+set_global_assignment -name SOURCE_FILE square_lut10.dump
+set_global_assignment -name SOURCE_FILE square_lut25.dump
+set_global_assignment -name SOURCE_FILE triangle_lut.dump
+set_global_assignment -name VERILOG_FILE press_duty_cycle.v
+set_global_assignment -name SOURCE_FILE square_lut75.dump
+set_global_assignment -name VERILOG_FILE choose_wave_sel.v
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name VERILOG_FILE button.v
+set_global_assignment -name VERILOG_FILE top_tb.v
+set_global_assignment -name EDA_TEST_BENCH_NAME top_tb -section_id eda_simulation
+set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id top_tb
+set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME top_tb -section_id top_tb
+set_global_assignment -name VERILOG_FILE fir_57tap_lowpass.v
+set_global_assignment -name EDA_TEST_BENCH_FILE waveform_generator_tb.v -section_id waveform_generator_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE top_tb.v -section_id top_tb
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

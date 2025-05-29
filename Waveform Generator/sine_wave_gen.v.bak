@@ -1,0 +1,25 @@
+module sine_wave_gen (
+    input clk,               // System clock
+    input reset,             // Reset signal
+    input [9:0] phase_acc,  // External phase accumulator
+    output reg [23:0] sine_wave // 24-bit sine wave output
+);
+
+    // LUT for sine wave (1024 samples, 24-bit each)
+    reg [23:0] sin_lut [0:1023];
+
+    // Load LUT data from a file
+    initial begin
+        $readmemh("D:/k242/Fgpa/fpga1.1/Fpga-main/Fpga-main/sine_lut.dump", sin_lut);
+    end
+
+
+    // Output sine wave value from LUT
+    always @(posedge clk) begin
+        if (reset)
+            sine_wave <= 24'd0;
+        else
+            sine_wave <= sin_lut[phase_acc];
+    end
+
+endmodule

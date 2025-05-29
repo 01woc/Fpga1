@@ -1,0 +1,9 @@
+module noise_injection (
+    input clk,               // Xung clock hệ thống
+    input reset,             // Tín hiệu reset
+    input [23:0] input_wave, // Sóng đầu vào
+    input noise_enable,      // Bật/tắt nhiễu
+    input [9:0] phase_acc,  // Điều khiển tần số biến đổi của nhiễu
+    input [1:0] shift_sel,   // Chọn mức dịch bit cho nhiễu
+    output reg [23:0] output_wave // Sóng đầu ra (có nhiễu)
+);

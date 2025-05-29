@@ -1,0 +1,13 @@
+module frequency_wave_sel(
+  input   [1:0] freq_wave_sel,
+  output reg [9:0] phase_step
+);
+  always_comb begin
+    case(freq_wave_sel)
+	   2'b00:  o_phase_step = 10'b1;  //1024 sample
+		2'b01:  o_phase_step = 10'b10; //512 sapmle
+		2'b10:  o_phase_step = 10'b100; // 256 sample
+		default: o_phase_step = 10'b1;
+	 endcase
+  end
+endmodule

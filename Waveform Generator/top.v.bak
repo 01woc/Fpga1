@@ -1,0 +1,65 @@
+ module top(
+    input wire clk_50,             // Tín hiệu clock 50 MHz đầu vào
+    input wire reset,              // Tín hiệu reset
+     input  logic [9:0] i_SW,
+	input  logic [3:1] i_KEY
+    output logic o_BCLK,           // Tín hiệu Bit Clock (BCLK) ra DAC
+    output logic o_DACLRC,         // Tín hiệu Left/Right Clock (L/R Clock) ra DAC
+    output logic o_DACDAT,         // Tín hiệu DAC Data ra DAC
+    output logic o_XCLK,           // Tín hiệu XCLK, có thể dùng cho một phần khác (ví dụ: I2C)
+    
+    output logic o_i2c_scl,        // Tín hiệu I2C Clock (SCL)
+    inout wire io_i2c_sda          // Tín hiệu I2C Data (SDA)
+);
+
+    wire clk_12;                   // Tín hiệu 12 MHz, có thể được tạo từ PLL
+    wire clk_48k;                  // Tín hiệu 48 kHz, cần sử dụng PLL để chia từ 50 MHz
+    wire [15:0] data_16bit;   	 // Dữ liệu sóng 16-bit từ wave generator
+	 
+clk_12 pll_50m_12m (
+ .reset_n(reset)
+ .clk_in(clk_50)
+ .clk_out(clk_12)
+
+);
+//
+clock_48K pll_12m_48k (
+ .reset_n(reset)
+ .clk_in(clk_12)
+ .clk_out(clk_48k)
+
+);
+
+
+    // Waveform Generator
+  wave_generator w_generator(
+    .clk_50(clk_50),
+	 .clk_48k(clk_48k), 
+	 .clk_12(clk_12),
+    .i_SW(i_SW),
+    .i_KEY(i_KEY),
+    .waveform_out(data_16bit)
+  );
+    
+    // DAC Control Module
+    dac_control dac_inst (
+        .clk_48k(clk_48k),           // Tín hiệu 48kHz điều khiển DAC
+        .data_in(data_16bit),        // Dữ liệu sóng 16-bit vào DAC
+        .BCLK(o_BCLK),               // Tín hiệu Bit Clock (BCLK)
+        .DACLRC(o_DACLRC),           // Tín hiệu Left/Right Clock (L/R Clock)
+        .DACDAT(o_DACDAT),           // Dữ liệu DAC (DAC Data)
+        .reset(reset)                // Tín hiệu reset
+    );
+
+    // I2C Controller for DAC (nếu cần cấu hình DAC qua I2C)
+    i2c_controller i2c_inst (
+        .clk(clk_50),                // Tín hiệu clock 50 MHz
+        .i2c_scl(o_i2c_scl),         // Tín hiệu SCL (Clock)
+        .i2c_sda(io_i2c_sda),        // Tín hiệu SDA (Data)
+        .start(1'b1),                // Bắt đầu giao tiếp I2C
+        .done(),                     // Khi giao tiếp I2C hoàn thành
+        .ack(),                      // Kiểm tra Acknowledgment từ DAC
+        .i2c_data(24'hxxxxxx)        // Cấu hình dữ liệu cho DAC (ví dụ: địa chỉ và thông số cấu hình)
+    );
+
+endmodule
