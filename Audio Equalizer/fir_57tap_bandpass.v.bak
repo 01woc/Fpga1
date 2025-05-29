@@ -1,0 +1,91 @@
+module fir_57tap_bandpass (
+    input  wire              clk,
+    input  wire signed [15:0] data_in,
+    output reg  signed [15:0] data_out
+);
+
+    // Hệ số FIR (fixed-point Q1.14, nhân với 16384)
+    reg signed [15:0] coeffs [0:56];
+    initial begin
+        coeffs[0]  = -6;
+        coeffs[1]  = -7;
+        coeffs[2]  = -4;
+        coeffs[3]  = 4;
+        coeffs[4]  = 14;
+        coeffs[5]  = 21;
+        coeffs[6]  = 22;
+        coeffs[7]  = 13;
+        coeffs[8]  = 0;
+        coeffs[9]  = -8;
+        coeffs[10] = 4;
+        coeffs[11] = 48;
+        coeffs[12] = 125;
+        coeffs[13] = 219;
+        coeffs[14] = 296;
+        coeffs[15] = 313;
+        coeffs[16] = 230;
+        coeffs[17] = 24;
+        coeffs[18] = -285;
+        coeffs[19] = -640;
+        coeffs[20] = -952;
+        coeffs[21] = -1123;
+        coeffs[22] = -1064;
+        coeffs[23] = -755;
+        coeffs[24] = -228;
+        coeffs[25] = 415;
+        coeffs[26] = 1033;
+        coeffs[27] = 1477;
+        coeffs[28] = 1638;
+        coeffs[29] = 1477;
+        coeffs[30] = 1033;
+        coeffs[31] = 415;
+        coeffs[32] = -228;
+        coeffs[33] = -755;
+        coeffs[34] = -1064;
+        coeffs[35] = -1123;
+        coeffs[36] = -952;
+        coeffs[37] = -640;
+        coeffs[38] = -285;
+        coeffs[39] = 24;
+        coeffs[40] = 230;
+        coeffs[41] = 313;
+        coeffs[42] = 296;
+        coeffs[43] = 219;
+        coeffs[44] = 125;
+        coeffs[45] = 48;
+        coeffs[46] = 4;
+        coeffs[47] = -8;
+        coeffs[48] = 0;
+        coeffs[49] = 13;
+        coeffs[50] = 22;
+        coeffs[51] = 21;
+        coeffs[52] = 14;
+        coeffs[53] = 4;
+        coeffs[54] = -4;
+        coeffs[55] = -7;
+        coeffs[56] = -6;
+    end
+
+    // Dãy mẫu đầu vào
+    reg signed [15:0] x_reg [0:56];
+
+    // Biến dùng trong xử lý
+    integer i;
+    reg signed [31:0] acc;
+
+    always @(posedge clk) begin
+        // Dịch dữ liệu
+        for (i = 56; i > 0; i = i - 1)
+            x_reg[i] <= x_reg[i - 1];
+        x_reg[0] <= data_in;
+
+        // Tính tích chập
+        acc = 0;
+        for (i = 0; i < 57; i = i + 1)
+            acc = acc + x_reg[i] * coeffs[i];
+
+        // Chia lại độ lớn (chuẩn Q1.14)
+        data_out <= acc >>> 14;
+    end
+
+endmodule

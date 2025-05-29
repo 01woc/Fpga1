@@ -1,0 +1,52 @@
+`timescale 1ns / 1ps
+
+module top_tb;
+
+// Inputs
+reg clk;
+reg reset;
+reg [9:0] i_SW;
+
+// Outputs
+wire [15:0] dout;
+
+// Instantiate the Unit Under Test (UUT)
+top uut (
+    .clk(clk),
+    .reset(reset),
+    .i_SW(i_SW),
+    .dout(dout)
+);
+
+// Clock generation
+always begin
+    #5 clk = ~clk; // Tạo xung clock với chu kỳ 10ns
+end
+
+// Stimulus process
+initial begin
+    // Initialize inputs
+    clk = 0;
+    reset = 0;
+    i_SW = 10'b0000000000;
+
+    // Apply reset
+    #10 reset = 1;  // Set reset active for 10 ns
+    #10 reset = 0;  // Deassert reset
+
+    // Test case 1: Set i_SW = 2'b00 (Chọn sóng sin)
+    #10 i_SW = 10'b0000000000;  // Chọn sóng sin
+    #10 i_SW = 10'b0000000001;  // Chọn sóng vuông
+    #10 i_SW = 10'b0000000010;  // Chọn sóng tam giác
+    #10 i_SW = 10'b0000000100;  // Chọn giá trị mặc định (0)
+
+    // Finish simulation after 100ns
+    #100 $finish;
+end
+
+// Monitor signals
+initial begin
+    $monitor("At time %t, dout = %h, i_SW = %b", $time, dout, i_SW);
+end
+
+endmodule

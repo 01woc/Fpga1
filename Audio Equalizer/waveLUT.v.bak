@@ -1,0 +1,27 @@
+module waveLUT (
+  input [9:0] i_addr,              // Địa chỉ LUT
+  output reg [15:0] o_data         // Dữ liệu đầu ra
+);
+
+  // Kích thước bộ nhớ LUT
+  parameter MEM_SIZE = 1024;
+
+ 
+  reg [15:0] LUT_wave [MEM_SIZE-1:0];
+
+  // Đọc giá trị từ LUT vào o_data tại mỗi chu kỳ đồng hồ hoặc khi thay đổi địa chỉ
+  always @* begin
+    o_data = LUT_wave[i_addr];  // Gán giá trị từ LUT theo địa chỉ i_addr
+  end
+
+  initial begin
+    integer i;
+    // Khởi tạo bộ nhớ LUT bằng 0
+    for (i = 0; i < MEM_SIZE; i = i + 1) begin
+      LUT_wave[i] = 16'b0;
+    end
+    // Đọc dữ liệu từ file .dump vào bộ nhớ LUT
+    $readmemh("C:/Users/TUAN/tailieuhocbk/nam4ki1/DSPonFPGA/HK242/lab1(new)/WM8731_test/LUT_sine.dump", LUT_wave);
+  end
+
+endmodule

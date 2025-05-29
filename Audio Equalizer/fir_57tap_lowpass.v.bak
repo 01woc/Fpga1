@@ -1,0 +1,91 @@
+module fir_57tap_lowpass (
+    input  wire              clk,
+    input  wire signed [15:0] data_in,
+    output reg  signed [15:0] data_out
+);
+
+    // Hệ số FIR (fixed point Q1.14, nhân với 16384)
+    reg signed [15:0] coeffs [0:56];
+    initial begin
+        coeffs[0]  = 0;
+        coeffs[1]  = 0;
+        coeffs[2]  = 0;
+        coeffs[3]  = 0;
+        coeffs[4]  = 1;
+        coeffs[5]  = 3;
+        coeffs[6]  = 6;
+        coeffs[7]  = 10;
+        coeffs[8]  = 17;
+        coeffs[9]  = 27;
+        coeffs[10] = 41;
+        coeffs[11] = 58;
+        coeffs[12] = 80;
+        coeffs[13] = 106;
+        coeffs[14] = 138;
+        coeffs[15] = 174;
+        coeffs[16] = 214;
+        coeffs[17] = 259;
+        coeffs[18] = 307;
+        coeffs[19] = 355;
+        coeffs[20] = 406;
+        coeffs[21] = 456;
+        coeffs[22] = 502;
+        coeffs[23] = 546;
+        coeffs[24] = 584;
+        coeffs[25] = 613;
+        coeffs[26] = 636;
+        coeffs[27] = 650;
+        coeffs[28] = 655;
+        coeffs[29] = 650;
+        coeffs[30] = 636;
+        coeffs[31] = 613;
+        coeffs[32] = 584;
+        coeffs[33] = 546;
+        coeffs[34] = 502;
+        coeffs[35] = 456;
+        coeffs[36] = 406;
+        coeffs[37] = 355;
+        coeffs[38] = 307;
+        coeffs[39] = 259;
+        coeffs[40] = 214;
+        coeffs[41] = 174;
+        coeffs[42] = 138;
+        coeffs[43] = 106;
+        coeffs[44] = 80;
+        coeffs[45] = 58;
+        coeffs[46] = 41;
+        coeffs[47] = 27;
+        coeffs[48] = 17;
+        coeffs[49] = 10;
+        coeffs[50] = 6;
+        coeffs[51] = 3;
+        coeffs[52] = 1;
+        coeffs[53] = 0;
+        coeffs[54] = 0;
+        coeffs[55] = 0;
+        coeffs[56] = 0;
+    end
+
+    // Dãy giá trị đầu vào
+    reg signed [15:0] x_reg [0:56];
+
+    // Cập nhật dãy mẫu vào và tính toán kết quả
+    integer i;
+    reg signed [31:0] acc;
+
+    always @(posedge clk) begin
+        // Dịch mẫu vào
+        for (i = 56; i > 0; i = i - 1)
+            x_reg[i] <= x_reg[i - 1];
+        x_reg[0] <= data_in;
+
+        // Tính tích chập (convolution)
+        acc = 0;
+        for (i = 0; i < 57; i = i + 1)
+            acc = acc + x_reg[i] * coeffs[i];
+
+        // Chia lại độ lớn nếu cần (ví dụ >>14 cho hệ số Q1.14)
+        data_out <= acc >>> 14;
+    end
+
+endmodule
